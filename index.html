@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Territory Game</title>
+        <style>
+            body {
+                font-family: sans-serif;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+            
+            .grid {
+                display: grid;
+                grid-template-rows: repeat(10, 30px);
+                grid-template-columns: repeat(10, 30px);
+                gap: 8px;
+                margin-top: 50px;
+                margin-bottom: 50px;
+            }
+
+            .cell {
+                width: 30px;
+                height: 30px;
+                background-color: #ddd;
+                cursor: pointer;
+                border-radius: 4px;
+                border-style: solid;
+                border-width: 2px;
+                border-color: transparent;
+            }
+
+            .one {
+                background-color: #4caf50;
+            }
+
+            .oneText {
+                color: #4caf50;
+            }
+
+            .two {
+               background-color: #ce74ab; 
+            }
+
+            .twoText {
+                color: #ce74ab;
+            }
+
+            .selected {
+                border-color: #777;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="grid" id="grid"></div>
+        <h2 class="oneText">Player 1 Score: <span id="score1">1</span></h2>
+        <h2 class="twoText">Player 2 Score: <span id="score2">1</span></h2>
+        <script>
+            const gridSize = 10
+            const gridElement = document.getElementById("grid")
+            const score1 = document.getElementById("score1")
+            const score2 = document.getElementById("score2")
+            const cells = []
+
+            let player1Score = 1
+            let player2Score = 1
+
+            for (let row = 0; row < gridSize; row++) {
+                cells[row] = []
+                for (let col = 0; col < gridSize; col++) {
+                    const cell = document.createElement("div")
+                    cell.classList.add("cell")
+                    cell.dataset.row = row
+                    cell.dataset.col = col
+                    cells[row][col] = cell
+                    gridElement.appendChild(cell)
+                }
+            }
+
+            const startRow1 = Math.floor(Math.random() * gridSize)
+            const startCol1 = Math.floor(Math.random() * gridSize)
+            cells[startRow1][startCol1].classList.add("one", "selected")
+
+            const startRow2 = Math.floor(Math.random() * gridSize)
+            const startCol2 = Math.floor(Math.random() * gridSize)
+            cells[startRow2][startCol2].classList.add("two", "selected")
+
+
+            let selectedRow1 = startRow1
+            let selectedCol1 = startCol1
+
+            let selectedRow2 = startRow2
+            let selectedCol2 = startCol2
+
+            function updateScores() {
+                score1.innerText = player1Score;
+                score2.innerText = player2Score;
+            }
+
+            function addOwned1(prev, row, col) {
+                const newCell = cells[row][col]
+
+                prev.classList.remove("selected")
+                newCell.classList.add("selected")
+                if (!newCell.classList.contains("one")) {
+                    newCell.classList.add("one")
+                    player1Score++
+                    updateScores()
+                }
+            }
+
+            function addOwned2(prev, row, col) {
+                const newCell = cells[row][col]
+
+                prev.classList.remove("selected")
+                newCell.classList.add("selected")
+                if (!newCell.classList.contains("two")) {
+                    newCell.classList.add("two")
+                    player2Score++
+                    updateScores()
+                }
+            }
+
+            document.addEventListener("keydown", (e) => {
+                const prevCell1 = cells[selectedRow1][selectedCol1]
+                const prevCell2 = cells[selectedRow2][selectedCol2]
+                switch (e.code) {
+                    case "ArrowUp":
+                        if (selectedRow1 > 0 && !cells[selectedRow1 - 1][selectedCol1].classList.contains("two")) {
+                            selectedRow1 -= 1
+                            addOwned1(prevCell1, selectedRow1, selectedCol1)
+                        }
+                        break;
+                    case "ArrowDown":
+                        if (selectedRow1 < gridSize - 1 && !cells[selectedRow1 + 1][selectedCol1].classList.contains("two")) {
+                            selectedRow1 += 1
+                            addOwned1(prevCell1, selectedRow1, selectedCol1)
+                        }
+                        break;
+                    case "ArrowLeft":
+                        if (selectedCol1 > 0 && !cells[selectedRow1][selectedCol1 - 1].classList.contains("two")) {
+                            selectedCol1 -= 1
+                            addOwned1(prevCell1, selectedRow1, selectedCol1)
+                        }
+                        break;
+                    case "ArrowRight":
+                        if (selectedCol1 < gridSize - 1 && !cells[selectedRow1][selectedCol1 + 1].classList.contains("two")) {
+                            selectedCol1 += 1
+                            addOwned1(prevCell1, selectedRow1, selectedCol1)
+                        }
+                        break;
+
+                    case "KeyW":
+                        if (selectedRow2 > 0 && !cells[selectedRow2 - 1][selectedCol2].classList.contains("one")) {
+                            selectedRow2 -= 1
+                            addOwned2(prevCell2, selectedRow2, selectedCol2)
+                        }
+                        break;
+                    case "KeyS":
+                        if (selectedRow2 < gridSize - 1 && !cells[selectedRow2 + 1][selectedCol2].classList.contains("one")) {
+                            selectedRow2 += 1
+                            addOwned2(prevCell2, selectedRow2, selectedCol2)
+                        }
+                        break;
+                    case "KeyA":
+                        if (selectedCol2 > 0 && !cells[selectedRow2][selectedCol2 - 1].classList.contains("one")) {
+                            selectedCol2 -= 1
+                            addOwned2(prevCell2, selectedRow2, selectedCol2)
+                        }
+                        break;
+                    case "KeyD":
+                        if (selectedCol2 < gridSize - 1 && !cells[selectedRow2][selectedCol2 + 1].classList.contains("one")) {
+                            selectedCol2 += 1
+                            addOwned2(prevCell2, selectedRow2, selectedCol2)
+                        }
+                        break;
+                }
+            })
+        </script>
+    </body>
+</html>
